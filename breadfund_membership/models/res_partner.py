@@ -13,8 +13,7 @@ class ResPartner(models.Model):
     _inherit = "res.partner"
 
     state = fields.Selection(STATE, default='draft')
-    bank_account_balance = fields.Float(
-        compute='_compute_bank_account_balance')
+    bank_account_balance = fields.Float()
     is_sick_now = fields.Boolean(compute='_compute_is_sick_now',
         string='Sick Now?')
     sick_ids = fields.One2many('res.partner.sick', 'partner_id',
@@ -39,14 +38,14 @@ class ResPartner(models.Model):
     @api.multi
     def action_confirm(self):
         self.ensure_one()
-        if self.bank_account_count < 0:
+        if self.bank_account_count <= 0:
             raise ValidationError(_(
                 'Error! '
                 'You cannot confirm a member that does '
                 'not have Bank Account(s).'
             ))
 
-        if self.bank_account_balance < 0:
+        if self.bank_account_balance <= 0:
             raise ValidationError(_(
                 'Error! '
                 'You cannot confirm a member that does '

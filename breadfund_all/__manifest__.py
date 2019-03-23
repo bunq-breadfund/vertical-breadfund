@@ -5,9 +5,9 @@
     'author': 'Sunflower IT',
     'website': 'http://www.sunflowerweb.nl',
     'category': 'Extra Tools',
-    'images': [],
-    'depends': ['account'],
-    'data': [
+    'depends': [
+        'breadfund_membership',
+        'account_bank_statement_import_bunq',
+        'account_invoicing',
     ],
-    'installable': True,
 }
