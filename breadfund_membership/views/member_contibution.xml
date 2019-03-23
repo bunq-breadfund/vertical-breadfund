@@ -15,10 +15,15 @@
                            statusbar_visible="draft,posted"/>
                </header>
                 <sheet>
-                    <group>
-                        <field name="partner_id"/>
-                        <field name="date"/>
-                        <field name="amount"/>
+                    <group col="2">
+                        <group>
+                            <field name="member_from_id"/>
+                            <field name="member_to_id"/>
+                        </group>
+                        <group>
+                            <field name="date"/>
+                            <field name="amount"/>
+                        </group>
                     </group>
                 </sheet>
             </form>
@@ -30,7 +35,8 @@
         <field name="model">member.contribution</field>
         <field name="arch" type="xml">
             <tree>
-                <field name="partner_id"/>
+                <field name="member_from_id"/>
+                <field name="member_to_id"/>
                 <field name="date"/>
                 <field name="amount"/>
             </tree>
@@ -42,8 +48,34 @@
         <field name="model">member.contribution</field>
         <field name="arch" type="xml">
             <search string="Member Contributions">
-                <field name="partner_id"/>
+                <field name="member_from_id"/>
+                <field name="member_to_id"/>
             </search>
         </field>
     </record>
+
+    <record id="action_member_contribution" model="ir.actions.act_window">
+        <field name="name">Member Contributions</field>
+        <field name="res_model">member.contribution</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form,pivot,graph</field>
+        <field name="context">{}</field>
+        <field name="domain">[]</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Click to create a new member contribution.
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_member_member"
+              name = "Member Payments"
+              sequence="1"
+              parent="membership.menu_association"/>
+
+    <menuitem action="action_member_contribution"
+              id="menu_member_contribution"
+              sequence="1"
+              parent="menu_member_member"/>
+
 </odoo>

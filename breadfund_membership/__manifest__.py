@@ -9,17 +9,15 @@
     'category': 'Extra Tools',
     'images': [],
     'depends': [
-        'membership',
-        'account',
-        'sale_contract',
+        'membership'
     ],
     'data': [
         'data/mail_templates.xml',
         'data/sequence.xml',
         'security/ir.model.access.csv',
-        'views/res_partner.xml',
         'views/member_contibution.xml',
-        'views/member_payment.xml'
+        'views/member_payment.xml',
+        'views/res_partner.xml'
     ],
     'installable': True,
 }

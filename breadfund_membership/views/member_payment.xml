@@ -16,7 +16,8 @@
                </header>
                 <sheet>
                     <group>
-                        <field name="partner_id"/>
+                        <field name="member_from_id"/>
+                        <field name="member_to_id"/>
                         <field name="date"/>
                         <field name="amount"/>
                     </group>
@@ -30,7 +31,8 @@
         <field name="model">member.payment</field>
         <field name="arch" type="xml">
             <tree>
-                <field name="partner_id"/>
+                <field name="member_from_id"/>
+                <field name="member_to_id"/>
                 <field name="date"/>
                 <field name="amount"/>
             </tree>
@@ -42,8 +44,27 @@
         <field name="model">member.payment</field>
         <field name="arch" type="xml">
             <search string="Member Payments">
-                <field name="partner_id"/>
+                <field name="member_from_id"/>
+                <field name="member_to_id"/>
             </search>
         </field>
     </record>
+    <record id="action_member_payment" model="ir.actions.act_window">
+        <field name="name">Member Payments</field>
+        <field name="res_model">member.payment</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form,pivot,graph</field>
+        <field name="context">{}</field>
+        <field name="domain">[]</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Click to create a new member payment.
+            </p>
+        </field>
+    </record>
+
+    <menuitem action="action_member_payment"
+              id="menu_member_payment"
+              sequence="2"
+              parent="menu_member_member"/>
 </odoo>
