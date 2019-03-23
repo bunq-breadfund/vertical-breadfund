@@ -10,7 +10,7 @@ STATE = [
 
 
 class MemberPayment(models.Model):
-    _inherit = "member.payment"
+    _name = "member.payment"
 
     partner_id = fields.Many2one('res.partner', 'Member', required=True)
     date = fields.Datetime(default=lambda s: fields.Datetime.now())

@@ -10,7 +10,7 @@ STATE = [
 
 
 class MemberContribution(models.Model):
-    _inherit = "member.contribution"
+    _name = "member.contribution"
 
     partner_id = fields.Many2one('res.partner', 'Member', required=True)
     date = fields.Datetime(default=lambda s: fields.Datetime.now())
