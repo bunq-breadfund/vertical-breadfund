@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="member_payment_form_view_bunq" model="ir.ui.view">
+        <field name="name">Member Payment Form</field>
+        <field name="model">member.payment</field>
+        <field name="inherit_id" ref="breadfund_membership.member_payment_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="pay_with_bunq"
+                        type="object"
+                        states="posted"
+                        string="Pay with BUNQ"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

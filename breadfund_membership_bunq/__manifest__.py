@@ -12,6 +12,7 @@
         'breadfund_membership',
     ],
     'data': [
+        'views/member_payment.xml',
         'views/res_partner.xml'
     ],
     'installable': True,

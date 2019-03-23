@@ -15,9 +15,9 @@
         'data/mail_templates.xml',
         'data/sequence.xml',
         'security/ir.model.access.csv',
-        'views/member_contibution.xml',
-        'views/member_payment.xml',
-        'views/res_partner.xml'
+        'views/res_partner.xml',
+        'views/member_contribution.xml',
+        'views/member_payment.xml'
     ],
     'installable': True,
 }

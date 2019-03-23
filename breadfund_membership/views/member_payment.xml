@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
-    <record id="member_contribution_form_view" model="ir.ui.view">
+    <record id="member_payment_form_view" model="ir.ui.view">
         <field name="name">Member Payment Form</field>
         <field name="model">member.payment</field>
         <field name="arch" type="xml">
@@ -12,12 +12,12 @@
                             states="draft"/>
                     <field name="state"
                            widget="statusbar"
-                           statusbar_visible="draft,posted"/>
+                           statusbar_visible="draft,posted,paid"/>
                </header>
                 <sheet>
                     <group>
-                        <field name="member_from_id"/>
-                        <field name="member_to_id"/>
+                        <field name="partner_from_id"/>
+                        <field name="partner_to_id"/>
                         <field name="date"/>
                         <field name="amount"/>
                     </group>
@@ -31,8 +31,8 @@
         <field name="model">member.payment</field>
         <field name="arch" type="xml">
             <tree>
-                <field name="member_from_id"/>
-                <field name="member_to_id"/>
+                <field name="partner_from_id"/>
+                <field name="partner_to_id"/>
                 <field name="date"/>
                 <field name="amount"/>
             </tree>
@@ -44,8 +44,8 @@
         <field name="model">member.payment</field>
         <field name="arch" type="xml">
             <search string="Member Payments">
-                <field name="member_from_id"/>
-                <field name="member_to_id"/>
+                <field name="partner_from_id"/>
+                <field name="partner_to_id"/>
             </search>
         </field>
     </record>
@@ -67,4 +67,5 @@
               id="menu_member_payment"
               sequence="2"
               parent="menu_member_member"/>
+
 </odoo>
