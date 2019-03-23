@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/../addons10/.idea/addons10.iml" filepath="$PROJECT_DIR$/../addons10/.idea/addons10.iml" />
+      <module fileurl="file:///odoo/odoo10/.idea/odoo10.iml" filepath="/odoo/odoo10/.idea/odoo10.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/vertical_breadfund.iml" filepath="$PROJECT_DIR$/.idea/vertical_breadfund.iml" />
+    </modules>
+  </component>
+</project>
