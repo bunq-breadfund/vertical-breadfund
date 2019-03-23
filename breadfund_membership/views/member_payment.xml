@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="member_contribution_form_view" model="ir.ui.view">
+        <field name="name">Member Payment Form</field>
+        <field name="model">member.payment</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_confirm"
+                            type="object"
+                            string="Confirm Payment"
+                            states="draft"/>
+                    <field name="state"
+                           widget="statusbar"
+                           statusbar_visible="draft,posted"/>
+               </header>
+                <sheet>
+                    <group>
+                        <field name="partner_id"/>
+                        <field name="date"/>
+                        <field name="amount"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="member_payment_tree_view" model="ir.ui.view">
+        <field name="name">Member Payment Tree</field>
+        <field name="model">member.payment</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="partner_id"/>
+                <field name="date"/>
+                <field name="amount"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="member_payment_search_view" model="ir.ui.view">
+        <field name="name">member payment search</field>
+        <field name="model">member.payment</field>
+        <field name="arch" type="xml">
+            <search string="Member Payments">
+                <field name="partner_id"/>
+            </search>
+        </field>
+    </record>
+</odoo>

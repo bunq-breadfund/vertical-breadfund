@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<odoo>
+
+    <!-- Email template for new users that used a signup token -->
+    <record id="mail_template_member_low_bank_balance"
+            model="mail.template">
+        <field name="name">Member's Low bank balance</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="email_from">"${object.company_id.name|safe}" &lt;${(object.company_id.email or user.email)|safe}&gt;</field>
+        <field name="email_to">${object.email|safe}</field>
+        <field name="subject">Low Bank Account Balance Nontification</field>
+        <field name="body_html" type="html">
+            <p>Dear ${object.name},</p>
+            <p>Your bank account balance is lower than expected contributions:</p>
+            <p><b>Expected Conributions:</b>${object.bank_account_balance}</p>
+            <p><b>Bank Account Balance:</b>${object.expected_contribution}</p>
+            <p style="font-size: 11px; margin-top: 10px;">
+                <strong>Sent by ${user.company_id.name}</strong>
+            </p>
+        </field>
+        <field name="user_signature" eval="False"/>
+    </record>
+</odoo>

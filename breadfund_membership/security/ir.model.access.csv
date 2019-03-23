@@ -1,2 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_res_partner_sick,access_res_partner_sick,model_res_partner_sick,sale_contract.group_sale_contract_manager,1,1,1,1
+access_member_contribution_user,access_member_contribution_user,model_member_contribution,base.group_user,1,1,1,1
+access_member_payment_user,access_member_payment_user,model_member_payment,base.group_user,1,1,1,1

@@ -14,6 +14,8 @@
         'sale_contract',
     ],
     'data': [
+        'data/mail_templates.xml',
+        'data/sequence.xml',
         'security/ir.model.access.csv',
         'views/res_partner.xml'
     ],

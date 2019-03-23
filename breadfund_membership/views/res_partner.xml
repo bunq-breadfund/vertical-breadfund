@@ -30,7 +30,10 @@
                     </group>
                     <field name="sick_ids">
                         <tree editable="bottom">
+                            <field name="name" readonly="1"/>
                             <field name="date_start"/>
+                            <field name="percentage"/>
+                            <field name="complete_month"/>
                             <field name="date_end"/>
                         </tree>
                     </field>

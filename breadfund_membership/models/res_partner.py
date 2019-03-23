@@ -14,26 +14,31 @@ class ResPartner(models.Model):
 
     state = fields.Selection(STATE, default='draft')
     bank_account_balance = fields.Float()
+    computed_bank_account_balance = fields.Float(
+        compute='_compute_bank_account_balance')
+    expected_contribution = fields.Float(
+        compute='_compute_expected_contribution')
     is_sick_now = fields.Boolean(compute='_compute_is_sick_now',
         string='Sick Now?')
     sick_ids = fields.One2many('res.partner.sick', 'partner_id',
         string='Sickness')
 
     @api.multi
+    def _compute_expected_contribution(self):
+        for this in self:
+            contributions = self.env['member.conrtibution'].search([
+                ('partner_id', '=', this.id)
+            ])
+            total = 0.0
+            for contribution in contributions:
+                total += contribution.amount
+            this.expected_contribution = total
+
+    @api.multi
     def _compute_is_sick_now(self):
         for this in self:
             sick_line = this.sick_ids.filtered(lambda x: not x.date_end)
             this.is_sick_now = True if sick_line else False
-
-    @api.multi
-    def _compute_bank_account_balance(self):
-        for this in self:
-            journal_ids = this.bank_ids.mapped('journal_id')
-            balance = 0.0
-            for journal in journal_ids:
-                dashboard_datas = journal.get_journal_dashboard_datas()
-                balance += dashboard_datas['account_balance']
-            this.bank_account_balance = balance
 
     @api.multi
     def action_confirm(self):
@@ -59,16 +64,37 @@ class ResPartner(models.Model):
         self.ensure_one()
         self.state = 'draft'
 
-    @api.model
-    def cron_amount_balance(self):
-        pass
-        # TODO: if amount not enough send out mail end month
+    @api.multi
+    def get_active_members(self):
+        members = self.search([
+            ('state', '=', 'confirmed'),
+            ('active', '=', True)
+        ])
+        return members
 
     @api.model
-    def cron_month_member_is_sick(self):
-        pass
-        # TODO:if yes, create draft payment with button "pay now with bunq"
-        # TODO:yes, maybe we send out an email if payment orders generated, but not validated
+    def cron_amount_balance(self):
+        members = self.get_active_members()
+        # send mail to members (once a month) whose bank balance is
+        # less than expected contribution.
+        for this in members:
+            if this.bank_account_balance < this.expected_contribution:
+                template = self.env.ref(
+                    'breadfund_membership.mail_template_member_low_bank_balance'
+                )
+                template.send_mail(this.id)
+
+    @api.model
+    def cron_month_gift_member(self):
+        members = self.get_active_members()
+        # check if days of sickness are a full month
+        # check percentage of sickness
+        # calculate gift - factor, percentage of sickness
+        # check if all members can pay their gifts to the sick member
+        # create payment order
+        # send mail to admin to validate
+        # create payment batch from all payments out (has from and to account)
+        # rename payment button to "Pay now with Bunq"
 
     @api.model
     def cron_automatic_send_payments(self):
@@ -89,5 +115,16 @@ class ResPartnerSick(models.Model):
     _description = "Sick lines for Members"
 
     partner_id = fields.Many2one('res.partner')
+    name = fields.Char(default='New')
     date_start = fields.Date('Start Date', required=True)
     date_end = fields.Date('End Date')
+    percentage = fields.Float(required=True)
+    complete_month = fields.Float(default=True)
+
+    @api.model
+    def create(self, vals):
+        if vals.get('name', _('New')) == _('New'):
+            vals['name'] = self.env['ir.sequence'].next_by_code(
+                    'res.partner.sick') or _('New')
+        ret = super(ResPartnerSick, self).create(vals)
+        return ret
