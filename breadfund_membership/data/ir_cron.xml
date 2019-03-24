@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<odoo>
+    <record model="ir.cron" id="cron_member_low_bank_balance">
+        <field name="name">Member Low Bank Balance Cron</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">months</field>
+        <field name="numbercall">-1</field>
+        <field name="doall" eval="False"/>
+        <field name="model_id" ref="model_res_partner"/>
+        <field name="function" eval="'cron_amount_balance'"/>
+        <field name="args" eval="'()'"/>
+    </record>
+
+    <record model="ir.cron" id="cron_month_gift_member">
+        <field name="name">Month Gift Member</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">months</field>
+        <field name="numbercall">-1</field>
+        <field name="doall" eval="False"/>
+        <field name="model_id" ref="model_res_partner"/>
+        <field name="function" eval="'cron_month_gift_member'"/>
+        <field name="args" eval="'()'"/>
+    </record>
+</odoo>
