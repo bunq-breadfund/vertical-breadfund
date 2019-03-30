@@ -12,10 +12,7 @@ STATE = [
 class MemberContribution(models.Model):
     _name = "member.contribution"
 
-    member_from_id = fields.Many2one('res.partner', 'Member From',
-        required=True)
-    member_to_id = fields.Many2one('res.partner', 'Member To',
-        required=True)
+    partner_id = fields.Many2one('res.partner', 'Member', required=True)
     date = fields.Datetime(default=lambda s: fields.Datetime.now())
     amount = fields.Float(required=True)
     state = fields.Selection(STATE, default='draft')

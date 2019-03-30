@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
-    name="button_box">
 
     <record id="base_view_partner_form_breadfund" model="ir.ui.view">
         <field name="name">base.view_partner_form.breadfund</field>
         <field name="model">res.partner</field>
+        <field name="priority">101</field>
         <field name="inherit_id" ref="base.view_partner_form"/>
         <field name="arch" type="xml">
             <xpath expr="//div[@name='button_box']" position="inside">
@@ -25,7 +25,7 @@
             </xpath>
 
             <xpath expr="//sheet" position="before">
-               <header>
+                <header>
                     <button name="action_confirm"
                             type="object"
                             string="Confirm Member"
@@ -37,13 +37,23 @@
                     <field name="state"
                            widget="statusbar"
                            statusbar_visible="draft,confirmed"/>
-               </header>
+                </header>
             </xpath>
-            <xpath expr="//field[@name='lang']" position="after">
-                <field name="bank_account_balance"/>
-                <field name="monthly_contribution_amount"/>
-                <field name="member_type_id"/>
-                <field name="calculated_savings"/>
+            <xpath expr="//notebook/page[1]" position="attributes">
+                <attribute name="autofocus"></attribute>
+            </xpath>
+            <xpath expr="//notebook/page[1]" position="before">
+                <page string="Breadfund" name="breadfund" autofocus="autofocus">
+                    <group>
+                        <field name="bank_account_balance"/>
+                        <field name="monthly_contribution_amount"/>
+                        <field name="member_type_id"/>
+                        <field name="calculated_savings"/>
+                    </group>
+                    <group>
+                        <field name="bank_ids"/>
+                    </group>
+                </page>
             </xpath>
             <notebook position="inside">
                 <page string="Sickness" name="sickness">
@@ -61,6 +71,45 @@
                     </field>
                 </page>
             </notebook>
+            <xpath expr="//field[@name='associate_member']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='free_member']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='vat']" position="attributes">
+                <attribute name="attrs">{'invisible':[('membership_state', '!=', 'none')]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='function']" position="attributes">
+                <attribute name="attrs">{'invisible':[('membership_state', '!=', 'none')]}</attribute>
+            </xpath>
+            <xpath expr="//page[@name='sales_purchases']" position="attributes">
+                <attribute name="attrs">{'invisible':[('membership_state', '!=', 'none')]}</attribute>
+            </xpath>
+            <xpath expr="//page[@name='accounting']" position="attributes">
+                <attribute name="attrs">{'invisible':[('membership_state', '!=', 'none')]}</attribute>
+            </xpath>
+            <xpath expr="//page[@name='accounting_disabled']" position="attributes">
+                <attribute name="attrs">{'invisible':[('membership_state', '!=', 'none')]}</attribute>
+            </xpath>
         </field>
     </record>
+
+    <record id="base_membership_members_tree_breadfund" model="ir.ui.view">
+        <field name="name">base.view_partner_tree.breadfund</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="membership.membership_members_tree"/>
+        <field name="priority">101</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='associate_member']" position="replace"/>
+            <xpath expr="//field[@name='membership_stop']" position="after">
+                <field name="state"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window.view" id="membership.action_membership_members_view_kanban">
+        <field name="sequence" eval="4"/>
+    </record>
+
 </odoo>

@@ -17,8 +17,7 @@
                 <sheet>
                     <group col="2">
                         <group>
-                            <field name="member_from_id"/>
-                            <field name="member_to_id"/>
+                            <field name="partner_id"/>
                         </group>
                         <group>
                             <field name="date"/>
@@ -35,8 +34,7 @@
         <field name="model">member.contribution</field>
         <field name="arch" type="xml">
             <tree>
-                <field name="member_from_id"/>
-                <field name="member_to_id"/>
+                <field name="partner_id"/>
                 <field name="date"/>
                 <field name="amount"/>
             </tree>
@@ -48,8 +46,7 @@
         <field name="model">member.contribution</field>
         <field name="arch" type="xml">
             <search string="Member Contributions">
-                <field name="member_from_id"/>
-                <field name="member_to_id"/>
+                <field name="partner_id"/>
             </search>
         </field>
     </record>

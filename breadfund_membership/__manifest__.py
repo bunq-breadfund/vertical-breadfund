@@ -16,6 +16,7 @@
         'data/sequence.xml',
         'security/ir_model_category.xml',
         'security/res_groups.xml',
+        'security/ir_rule.xml',
         'security/ir.model.access.csv',
         'views/member_contribution.xml',
         'views/member_payment.xml',
@@ -26,4 +27,3 @@
     ],
     'installable': True,
 }
-p

@@ -14,8 +14,10 @@ class ResPartner(models.Model):
     _inherit = "res.partner"
 
     state = fields.Selection(STATE, default='draft')
-    bank_account_balance = fields.Float()
+    bank_account_balance = fields.Float(
+        string='Account balance')
     computed_bank_account_balance = fields.Float(
+        string='Account balance',
         compute='_compute_bank_account_balance')
     expected_contribution = fields.Float(
         compute='_compute_expected_contribution')
@@ -24,7 +26,8 @@ class ResPartner(models.Model):
         string='Sick Now?')
     sick_ids = fields.One2many('res.partner.sick', 'partner_id',
         string='Sickness')
-    monthly_contribution_amount = fields.Float()
+    monthly_contribution_amount = fields.Float(
+        string='Monthly contribution')
     member_type_id = fields.Many2one('res.partner.member.type', required=True,
         string="Member Type")
     calculated_savings = fields.Float(compute='_compute_calculated_savings',
@@ -37,11 +40,11 @@ class ResPartner(models.Model):
         for this in self:
             upfront_contrib = this.member_type_id.upfront_contribution_amount
             contributions = self.env['member.contribution'].search([
-                ('member_from_id', '=', this.id),
+                ('partner_id', '=', this.id),
                 ('state', '=', 'posted')
             ]).mapped('amount')
-            gifted_payments = self.env['member.contribution'].search([
-                ('member_to_id', '=', this.id),
+            gifted_payments = self.env['member.payment'].search([
+                ('partner_to_id', '=', this.id),
                 ('state', '=', 'paid')
             ]).mapped('amount')
             this.calculated_savings = upfront_contrib + sum(contributions) \
@@ -51,7 +54,7 @@ class ResPartner(models.Model):
     def _compute_expected_contribution(self):
         for this in self:
             contributions = self.env['member.contribution'].search([
-                ('member_from_id', '=', this.id)
+                ('partner_id', '=', this.id)
             ])
             total = 0.0
             for contribution in contributions:
@@ -62,7 +65,7 @@ class ResPartner(models.Model):
     def _compute_total_payment(self):
         for this in self:
             payments = self.env['member.payment'].search([
-                ('member_to_id', '=', this.id)
+                ('partner_to_id', '=', this.id)
             ])
             total = 0.0
             for payment in payments:
@@ -180,8 +183,8 @@ class ResPartner(models.Model):
                 if members_can_pay:
                     for m in members:
                         vals=dict(
-                            member_from_id=m.id,
-                            member_to_id=member.id,
+                            partner_from_id=m.id,
+                            partner_to_id=member.id,
                             amount=m.monthly_contribution_amount
                         )
                         self.env['member.payment'].create(vals)
@@ -222,13 +225,3 @@ class ResPartnerSick(models.Model):
                     'res.partner.sick') or _('New')
         ret = super(ResPartnerSick, self).create(vals)
         return ret
-
-
-class ResPartnerMemberType(models.Model):
-    _name = "res.partner.member.type"
-
-    name = fields.Char()
-    partner_id = fields.Many2one('res.partner')
-    upfront_contribution_amount = fields.Float(required=True)
-    monthly_contribution_amount = fields.Float(required=True)
-    monthly_sick_amount = fields.Float(required=True)
