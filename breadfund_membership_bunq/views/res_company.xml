@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_company_view_form_inherit_bunq_breadfund" model="ir.ui.view">
+        <field name="name">res.company.form (BUNQ breadfund)</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="priority">101</field>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='breadfund']/group" position="inside">
+                <group name="bunq" string="bunq account of breadfund" colspan="4">
+                    <field name="bunq_email"/>
+                    <field name="bunq_api_key"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright 2019 Sunflower IT (http://sunflowerweb.nl/)
+-->
+<odoo>
+
+    <record model="res.groups" id="group_breadfund_user">
+        <field name="name">Breadfund user</field>
+        <field name="category_id" ref="category_breadfund" />
+    </record>
+
+    <record model="res.groups" id="group_breadfund_administrator">
+        <field name="name">Breadfund administrator</field>
+        <field name="category_id" ref="category_breadfund" />
+        <field name="users" eval="[(4, ref('base.user_root'))]"/>
+        <field name="implied_ids" eval="[(4, ref('group_breadfund_user'))]" />
+    </record>
+
+</odoo>
