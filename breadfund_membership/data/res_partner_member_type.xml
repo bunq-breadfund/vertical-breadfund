@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<data noupdate="1">
+    <record id="basic_member_type" model="res.partner.member.type">
+        <field name="name">Basic member</field>
+        <field name="upfront_contribution_amount">250.00</field>
+        <field name="monthly_contribution_amount">50.00</field>
+        <field name="monthly_sick_amount">1000.00</field>
+    </record>
+</data>
+</odoo>

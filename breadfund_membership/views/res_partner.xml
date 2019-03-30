@@ -26,14 +26,18 @@
 
             <xpath expr="//sheet" position="before">
                 <header>
-                    <button name="action_confirm"
+                    <button name="action_confirm_details"
                             type="object"
                             string="Confirm Member"
                             states="draft"/>
+                    <button name="action_confirm_authorization"
+                            type="object"
+                            string="Confirm Bank account authorization"
+                            states="waiting_auth"/>
                     <button name="action_set_draft"
                             type="object"
                             string="Set to Draft"
-                            states="confirmed"/>
+                            states="active,waiting_auth"/>
                     <field name="state"
                            widget="statusbar"
                            statusbar_visible="draft,confirmed"/>
@@ -45,9 +49,10 @@
             <xpath expr="//notebook/page[1]" position="before">
                 <page string="Breadfund" name="breadfund" autofocus="autofocus">
                     <group>
+                        <field name="member_type_id"
+                               attrs="{'required':[('membership_state', '!=', 'none')]}"/>
                         <field name="bank_account_balance"/>
                         <field name="monthly_contribution_amount"/>
-                        <field name="member_type_id"/>
                         <field name="calculated_savings"/>
                     </group>
                     <group>
@@ -101,9 +106,21 @@
         <field name="inherit_id" ref="membership.membership_members_tree"/>
         <field name="priority">101</field>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='associate_member']" position="replace"/>
-            <xpath expr="//field[@name='membership_stop']" position="after">
+            <xpath expr="//field[@name='associate_member']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='membership_state']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='membership_stop']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='name']" position="after">
                 <field name="state"/>
+                <field name="member_type_id"/>
+            </xpath>
+            <xpath expr="//field[@name='membership_stop']" position="after">
+                <field name="bank_account_balance"/>
             </xpath>
         </field>
     </record>

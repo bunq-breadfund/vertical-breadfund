@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="member_type_form_view" model="ir.ui.view">
+        <field name="name">Member Type Form</field>
+        <field name="model">res.partner.member.type</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group colspan="4">
+                        <field name="name"/>
+                        <field name="upfront_contribution_amount"/>
+                        <field name="monthly_contribution_amount"/>
+                        <field name="monthly_sick_amount"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="member_type_tree_view" model="ir.ui.view">
+        <field name="name">Member Type Tree</field>
+        <field name="model">res.partner.member.type</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="upfront_contribution_amount"/>
+                <field name="monthly_contribution_amount"/>
+                <field name="monthly_sick_amount"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="member_type_search_view" model="ir.ui.view">
+        <field name="name">Member Type Search</field>
+        <field name="model">res.partner.member.type</field>
+        <field name="arch" type="xml">
+            <search string="Member Payments">
+                <field name="name"/>
+                <field name="upfront_contribution_amount"/>
+                <field name="monthly_contribution_amount"/>
+                <field name="monthly_sick_amount"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_member_type" model="ir.actions.act_window">
+        <field name="name">Member Types</field>
+        <field name="res_model">res.partner.member.type</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{}</field>
+        <field name="domain">[]</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Click to create a new member type.
+            </p>
+        </field>
+    </record>
+
+    <menuitem action="action_member_type"
+              id="menu_member_type"
+              sequence="2"
+              parent="membership.menu_marketing_config_association"/>
+
+</odoo>

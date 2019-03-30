@@ -13,6 +13,7 @@
     ],
     'data': [
         'data/mail_templates.xml',
+        'data/res_partner_member_type.xml',
         'data/sequence.xml',
         'security/ir_model_category.xml',
         'security/res_groups.xml',
@@ -22,6 +23,7 @@
         'views/member_payment.xml',
         'views/res_company.xml',
         'views/res_partner.xml',
+        'views/res_partner_member_type.xml',
         'views/res_company.xml',
         'data/ir_cron.xml'
     ],
