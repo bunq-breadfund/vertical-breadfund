@@ -14,11 +14,15 @@
     'data': [
         'data/mail_templates.xml',
         'data/sequence.xml',
+        'security/ir_model_category.xml',
+        'security/res_groups.xml',
         'security/ir.model.access.csv',
-        'views/member_contibution.xml',
-        'views/member_payment.xml',
-        'views/res_partner.xml',
         'data/ir_cron.xml'
+        'views/member_contribution.xml',
+        'views/member_payment.xml',
+        'views/res_company.xml',
+        'views/res_partner.xml',
     ],
     'installable': True,
 }
+p

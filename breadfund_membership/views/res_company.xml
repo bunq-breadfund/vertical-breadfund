@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_company_view_form_inherit_bunq_breadfund" model="ir.ui.view">
+        <field name="name">res.company.form (breadfund)</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="priority">20</field>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page name="breadfund" string="Breadfund configuration"
+                      groups="breadfund_membership.group_breadfund_administrator">
+                    <group>
+                        <group>
+                            <field name="waiting_days"/>
+                            <field name="max_months_sick"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>
