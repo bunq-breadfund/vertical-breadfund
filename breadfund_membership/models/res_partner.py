@@ -24,8 +24,28 @@ class ResPartner(models.Model):
         string='Sick Now?')
     sick_ids = fields.One2many('res.partner.sick', 'partner_id',
         string='Sickness')
-    factor = fields.Float(default=1.5)
     monthly_contribution_amount = fields.Float()
+    member_type_id = fields.Many2one('res.partner.member.type', required=True,
+        string="Member Type")
+    calculated_savings = fields.Float(compute='_compute_calculated_savings',
+        store=True)
+
+    @api.multi
+    def _compute_calculated_savings(self):
+        # starting date of membership + upfront contributions +
+        # monthly contributions sum - sickness gifts sum
+        for this in self:
+            upfront_contrib = this.member_type_id.upfront_contribution_amount
+            contributions = self.env['member.contribution'].search([
+                ('member_from_id', '=', this.id),
+                ('state', '=', 'posted')
+            ]).mapped('amount')
+            gifted_payments = self.env['member.contribution'].search([
+                ('member_to_id', '=', this.id),
+                ('state', '=', 'paid')
+            ]).mapped('amount')
+            this.calculated_savings = upfront_contrib + sum(contributions) \
+                - sum(gifted_payments)
 
     @api.multi
     def _compute_expected_contribution(self):
@@ -103,11 +123,14 @@ class ResPartner(models.Model):
     def check_members_can_pay_gift(self, sick):
         ret = True
         percentage = sick.percentage
-        factor = 1.5
         members = self.get_active_members()
+        factor = 0.5 * len(members)
         total_monthly_contributions = members.mapped(
             'monthly_contribution_amount')
-        total_gifts = sum([m.monthly_contribution_amount * factor * percentage for m in members])
+        total_gifts = sum([
+            m.monthly_contribution_amount * factor * percentage
+            for m in members
+        ])
         gift_percentage = total_gifts / total_monthly_contributions
         broke_members = members.filtered(
             lambda x:
@@ -122,8 +145,9 @@ class ResPartner(models.Model):
         return ret
 
     @api.model
-    def cron_month_gift_member(self):
+    def cron_daily_gift_member(self):
         members = self.get_active_members()
+        valid_pay_sickness = False
         for member in members:
             # check if days of sickness are a full month
             # check if still sick (no date_end)
@@ -132,7 +156,24 @@ class ResPartner(models.Model):
                 not x.date_end and
                 x.complete_month
             )
+            # check date difference in days
             if valid_sick:
+                sickness = valid_sick[0]
+                today = fields.Datetime.now()
+                days_diff = (fields.Date.from_string(sickness.date_start) -
+                        fields.Date.from_string(today)).days
+
+            #  if sick since 14 days + one month then valid
+            if days_diff > 30 + 14:
+                valid_pay_sickness = True
+
+            if days_diff > 14 and \
+                sickness.end_date and \
+                today > sickness.end_date \
+                and today - sickness.start_date < (30 + 14):
+                valid_pay_sickness = True
+
+            if valid_pay_sickness:
                 members_can_pay = self.check_members_can_pay_gift(valid_sick)
                 # create payments if all members can pay gift
                 # (to be validated by admin)
@@ -144,8 +185,11 @@ class ResPartner(models.Model):
                             amount=m.monthly_contribution_amount
                         )
                         self.env['member.payment'].create(vals)
+                        # send mail to admin to validate
+                # send mail to admin to validate
+                else:
+                    pass
 
-        # send mail to admin to validate
         # create payment batch from all payments out (has from and to account)
         # rename payment button to "Pay now with Bunq"
 
@@ -178,3 +222,13 @@ class ResPartnerSick(models.Model):
                     'res.partner.sick') or _('New')
         ret = super(ResPartnerSick, self).create(vals)
         return ret
+
+
+class ResPartnerMemberType(models.Model):
+    _name = "res.partner.member.type"
+
+    name = fields.Char()
+    partner_id = fields.Many2one('res.partner')
+    upfront_contribution_amount = fields.Float(required=True)
+    monthly_contribution_amount = fields.Float(required=True)
+    monthly_sick_amount = fields.Float(required=True)

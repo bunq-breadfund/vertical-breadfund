@@ -42,6 +42,8 @@
             <xpath expr="//field[@name='lang']" position="after">
                 <field name="bank_account_balance"/>
                 <field name="monthly_contribution_amount"/>
+                <field name="member_type_id"/>
+                <field name="calculated_savings"/>
             </xpath>
             <notebook position="inside">
                 <page string="Sickness" name="sickness">

@@ -13,8 +13,8 @@ STATE = [
 class MemberPayment(models.Model):
     _name = "member.payment"
 
-    partner_from_id = fields.Many2one('res.partner', 'Member from', required=True)
-    partner_to_id = fields.Many2one('res.partner', 'Member to', required=True)
+    member_from_id = fields.Many2one('res.partner', 'Member from', required=True)
+    member_to_id = fields.Many2one('res.partner', 'Member to', required=True)
     date = fields.Datetime(default=lambda s: fields.Datetime.now())
     amount = fields.Float(required=True)
     state = fields.Selection(STATE, default='draft')

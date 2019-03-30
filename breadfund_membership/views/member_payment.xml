@@ -16,8 +16,8 @@
                </header>
                 <sheet>
                     <group>
-                        <field name="partner_from_id"/>
-                        <field name="partner_to_id"/>
+                        <field name="member_from_id"/>
+                        <field name="member_to_id"/>
                         <field name="date"/>
                         <field name="amount"/>
                     </group>
@@ -31,8 +31,8 @@
         <field name="model">member.payment</field>
         <field name="arch" type="xml">
             <tree>
-                <field name="partner_from_id"/>
-                <field name="partner_to_id"/>
+                <field name="member_from_id"/>
+                <field name="member_to_id"/>
                 <field name="date"/>
                 <field name="amount"/>
             </tree>
@@ -44,8 +44,8 @@
         <field name="model">member.payment</field>
         <field name="arch" type="xml">
             <search string="Member Payments">
-                <field name="partner_from_id"/>
-                <field name="partner_to_id"/>
+                <field name="member_from_id"/>
+                <field name="member_to_id"/>
             </search>
         </field>
     </record>

@@ -17,11 +17,12 @@
         'security/ir_model_category.xml',
         'security/res_groups.xml',
         'security/ir.model.access.csv',
-        'data/ir_cron.xml'
         'views/member_contribution.xml',
         'views/member_payment.xml',
         'views/res_company.xml',
         'views/res_partner.xml',
+        'views/res_company.xml',
+        'data/ir_cron.xml'
     ],
     'installable': True,
 }
