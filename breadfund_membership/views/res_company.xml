@@ -9,7 +9,12 @@
             <xpath expr="//notebook" position="inside">
                 <page name="breadfund" string="Breadfund configuration"
                       groups="breadfund_membership.group_breadfund_administrator">
-                    <group/>
+                    <group>
+                        <group>
+                            <field name="waiting_days"/>
+                            <field name="max_months_sick"/>
+                        </group>
+                    </group>
                 </page>
             </xpath>
         </field>
