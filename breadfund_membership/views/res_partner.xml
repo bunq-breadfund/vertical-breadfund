@@ -13,14 +13,24 @@
                         name="%(breadfund_membership.action_member_contribution)d"
                         context="{'search_default_partner_id': [active_id], 'default_partner_id': active_id}"
                         icon="fa-usd">
-                    <field string="Contributions" name="expected_contribution" widget="statinfo"/>
+                    <div class="o_form_field o_stat_info">
+                        <span class="o_stat_value">
+                            <field name="expected_contribution" widget="monetary"/>
+                        </span>
+                        <span class="o_stat_text">Contributions</span>
+                    </div>
                 </button>
                 <button class="oe_stat_button"
                         type="action"
                         name="%(breadfund_membership.action_member_payment)d"
                         context="{'search_default_partner_id': [active_id], 'default_partner_id': active_id}"
                         icon="fa-usd">
-                    <field string="Gift Payments" name="total_payment" widget="statinfo"/>
+                    <div class="o_form_field o_stat_info">
+                        <span class="o_stat_value">
+                            <field name="total_payment" widget="monetary"/>
+                        </span>
+                        <span class="o_stat_text">Gift payments</span>
+                    </div>
                 </button>
             </xpath>
 
@@ -40,7 +50,7 @@
                             states="active,waiting_auth"/>
                     <field name="state"
                            widget="statusbar"
-                           statusbar_visible="draft,confirmed"/>
+                           statusbar_visible="draft,waiting_auth,active"/>
                 </header>
             </xpath>
             <xpath expr="//notebook/page[1]" position="attributes">
@@ -49,11 +59,17 @@
             <xpath expr="//notebook/page[1]" position="before">
                 <page string="Breadfund" name="breadfund" autofocus="autofocus">
                     <group>
-                        <field name="member_type_id"
-                               attrs="{'required':[('membership_state', '!=', 'none')]}"/>
-                        <field name="bank_account_balance"/>
-                        <field name="monthly_contribution_amount"/>
-                        <field name="calculated_savings"/>
+                        <group>
+                            <field name="member_type_id"
+                                   attrs="{'required':[('membership_state', '!=', 'none')]}"/>
+                            <field name="bank_account_balance"/>
+                            <field name="calculated_savings"/>
+                            <field name="fair_share_factor"/>
+                        </group>
+                        <group>
+                            <field name="monthly_contribution_amount"/>
+                            <field name="monthly_sick_amount"/>
+                        </group>
                     </group>
                     <group>
                         <field name="bank_ids"/>
@@ -68,10 +84,12 @@
                     <field name="sick_ids">
                         <tree editable="bottom">
                             <field name="name" readonly="1"/>
-                            <field name="date_start"/>
-                            <field name="percentage"/>
-                            <field name="complete_month"/>
+                            <field name="date_start" attrs="{'readonly': [('payments_made','>',0)]}"/>
                             <field name="date_end"/>
+                            <field name="percentage"/>
+                            <field name="payments_made"/>
+                            <field name="next_payment_date"/>
+                            <field name="next_payment_amount"/>
                         </tree>
                     </field>
                 </page>

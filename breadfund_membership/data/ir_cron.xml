@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding='UTF-8'?>
 <odoo>
     <record model="ir.cron" id="cron_member_low_bank_balance">
-        <field name="name">Member Low Bank Balance Cron</field>
+        <field name="name">Breadfund: Member Low Bank Balance Cron</field>
         <field name="interval_number">1</field>
         <field name="interval_type">months</field>
+        <field name="state">code</field>
         <field name="numbercall">-1</field>
         <field name="doall" eval="False"/>
         <field name="model_id" ref="model_res_partner"/>
-        <field name="function" eval="'cron_amount_balance'"/>
-        <field name="args" eval="'()'"/>
+        <field name="code">model.cron_amount_balance()</field>
     </record>
 
     <record model="ir.cron" id="cron_month_gift_member">
-        <field name="name">Month Gift Member</field>
+        <field name="name">Breadfund: Create draft gift payments</field>
         <field name="interval_number">1</field>
         <field name="interval_type">days</field>
+        <field name="state">code</field>
         <field name="numbercall">-1</field>
         <field name="doall" eval="False"/>
         <field name="model_id" ref="model_res_partner"/>
-        <field name="function" eval="'cron_daily_gift_member'"/>
-        <field name="args" eval="'()'"/>
+        <field name="code">model.cron_daily_gift_member()</field>
     </record>
 </odoo>

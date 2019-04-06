@@ -15,22 +15,27 @@ class ResPartner(models.Model):
     _inherit = "res.partner"
 
     state = fields.Selection(STATE, default='draft')
-    bank_account_balance = fields.Float(
+    bank_account_balance = fields.Monetary(
         string='Account balance')
-    computed_bank_account_balance = fields.Float(
+    computed_bank_account_balance = fields.Monetary(
         string='Account balance',
         compute='_compute_bank_account_balance')
-    expected_contribution = fields.Float(
+    expected_contribution = fields.Monetary(
         compute='_compute_expected_contribution')
-    total_payment = fields.Float(compute='_compute_total_payment')
+    total_payment = fields.Monetary(compute='_compute_total_payment')
     is_sick_now = fields.Boolean(compute='_compute_is_sick_now',
         string='Sick Now?')
     sick_ids = fields.One2many(
         'res.partner.sick', 'partner_id',
         string='Sickness')
-    monthly_contribution_amount = fields.Float(
+    monthly_contribution_amount = fields.Monetary(
         string='Monthly contribution',
-        related='member_type_id.monthly_contribution_amount')
+        related='member_type_id.monthly_contribution_amount',
+        readonly=True)
+    monthly_sick_amount = fields.Monetary(
+        string='Amount received when sick',
+        related='member_type_id.monthly_sick_amount',
+        readonly=True)
     member_type_id = fields.Many2one(
         'res.partner.member.type',
         default=lambda self: self.env.ref(
@@ -38,9 +43,31 @@ class ResPartner(models.Model):
             raise_if_not_found=False)
             or self.env['res.partner.member.type'].browse([]),
         string="Member Type")
-    calculated_savings = fields.Float(
+    calculated_savings = fields.Monetary(
         compute='_compute_calculated_savings',
         store=True)
+    fair_share_factor = fields.Float(
+        string='Fair share factor',
+        compute='_compute_fair_share_factor'
+    )
+
+    def _compute_fair_share_factor(self):
+        total_amount = 0.0
+        self.env.cr.execute('''
+            select sum(t.monthly_sick_amount)
+            from res_partner p, res_partner_member_type t
+            where p.member_type_id = t.id
+            and p.state = 'active'
+        ''')
+        result = self.env.cr.fetchall()
+        if result:
+            total_amount = result[0][0]
+        for this in self:
+            if total_amount > 0:
+                this.fair_share_factor = \
+                    this.monthly_sick_amount / total_amount
+            else:
+                this.fair_share_factor = 0.0
 
     @api.multi
     def _compute_calculated_savings(self):
@@ -116,13 +143,9 @@ class ResPartner(models.Model):
         self.ensure_one()
         self.state = 'draft'
 
-    @api.multi
+    @api.model
     def get_active_members(self):
-        members = self.search([
-            ('state', '=', 'active'),
-            ('active', '=', True)
-        ])
-        return members
+        return self.search([('state', '=', 'active')])
 
     @api.model
     def cron_amount_balance(self):
@@ -136,76 +159,32 @@ class ResPartner(models.Model):
                 )
                 template.send_mail(this.id)
 
-    @api.multi
-    def check_members_can_pay_gift(self, sick):
-        ret = True
-        percentage = sick.percentage
-        members = self.get_active_members()
-        factor = 0.5 * len(members)
-        total_monthly_contributions = members.mapped(
-            'monthly_contribution_amount')
-        total_gifts = sum([
-            m.monthly_contribution_amount * factor * percentage
-            for m in members
-        ])
-        gift_percentage = total_gifts / total_monthly_contributions
-        broke_members = members.filtered(
-            lambda x:
-            x.monthly_contribution_amount * gift_percentage
-            >
-            x.bank_account_balance
-        )
-        if broke_members:
-            ret = False
-            raise UserError(_("some members have insufficient funds!"))
-            # TODO: Send mail to admin or the members, show list of members
-        return ret
-
     @api.model
     def cron_daily_gift_member(self):
+        today = fields.Date.context_today(self)
         members = self.get_active_members()
-        valid_pay_sickness = False
-        for member in members:
-            # check if days of sickness are a full month
-            # check if still sick (no date_end)
-            valid_sick = member.sick_ids.filtered(
-               lambda x:
-                not x.date_end and
-                x.complete_month
-            )
-            # check date difference in days
-            if valid_sick:
-                sickness = valid_sick[0]
-                today = fields.Datetime.now()
-                days_diff = (fields.Date.from_string(sickness.date_start) -
-                        fields.Date.from_string(today)).days
-
-            #  if sick since 14 days + one month then valid
-            if days_diff > 30 + 14:
-                valid_pay_sickness = True
-
-            if days_diff > 14 and \
-                sickness.end_date and \
-                today > sickness.end_date \
-                and today - sickness.start_date < (30 + 14):
-                valid_pay_sickness = True
-
-            if valid_pay_sickness:
-                members_can_pay = self.check_members_can_pay_gift(valid_sick)
-                # create payments if all members can pay gift
-                # (to be validated by admin)
-                if members_can_pay:
-                    for m in members:
-                        vals=dict(
-                            partner_from_id=m.id,
-                            partner_to_id=member.id,
-                            amount=m.monthly_contribution_amount
-                        )
-                        self.env['member.payment'].create(vals)
-                        # send mail to admin to validate
-                # send mail to admin to validate
-                else:
-                    pass
+        for sickness in members.mapped('sick_ids'):
+            next_payment_date = sickness.next_payment_date
+            if not next_payment_date or next_payment_date < today:
+                continue
+            total_gift = sickness.next_payment_amount
+            for member in members:
+                amount = total_gift * member.fair_share_factor
+                if member.bank_account_balance < amount:
+                    raise UserError(_(
+                        "Member {} only has {}, not {}").format(
+                            member.display_name,
+                            member.bank_account_balance,
+                            amount
+                        ))
+                vals=dict(
+                    partner_from_id=member.id,
+                    partner_to_id=sickness.partner_id.id,
+                    amount=total_gift * member.fair_share_factor
+                )
+                self.env['member.payment'].create(vals)
+            sickness.payments_made += 1
+            # send mail to admin to validate these draft payments
 
         # create payment batch from all payments out (has from and to account)
         # rename payment button to "Pay now with Bunq"
@@ -213,9 +192,9 @@ class ResPartner(models.Model):
     @api.model
     def cron_automatic_send_payments(self):
         pass
-        # TODO:if validated payout:
-        # TODO:send mail to subscription manager: payment sent out
-        # TODO:send mail to member: payment received
+        # pay out any payments that were validated by admin
+        # send mail to subscription manager: payment sent out
+        # send mail to member: payment received
 
     # TODO: Add these to res partner
     # send mail when autogenerated invoice
