@@ -12,12 +12,14 @@ class MemberContribution(models.Model):
     date = fields.Datetime(default=lambda s: fields.Datetime.now())
     amount = fields.Float(required=True)
 
-    @api.model
-    def create(self, vals):
-        partner_name = self.env['res.partner'].browse(vals['partner_id']).name
-        date = fields.Date.from_string(vals['date']).isoformat()
-        vals['name'] = "%s - %s - %s" % (
-            partner_name, date, vals['amount']
-        )
-        ret = super(MemberContribution, self).create(vals)
-        return ret
+    @api.multi
+    def name_get(self):
+        res = []
+        for contribution in self:
+            name = "%s - %s - %s" % (
+                contribution.partner_id.name,
+                fields.Date.from_string(contribution.date).isoformat(),
+                contribution.amount
+            )
+            res.append((contribution.id, name))
+        return res
