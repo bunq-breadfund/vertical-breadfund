@@ -28,7 +28,7 @@ class MemberPayment(models.Model):
             if iban_to == iban_from:
                 raise ValidationError(
                     'Source and destination members cannot have the same IBAN')
-            this._pay_with_bunq(iban_from, iban_to, this.amount)
+            #this._pay_with_bunq(iban_from, iban_to, this.amount)
             this.state = 'paid'
 
     @api.model

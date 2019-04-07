@@ -195,7 +195,7 @@ class ResPartner(models.Model):
         members = self.get_active_members()
         for sickness in members.mapped('sick_ids'):
             next_payment_date = sickness.next_payment_date
-            if not next_payment_date or next_payment_date < today:
+            if (not next_payment_date) or next_payment_date > today:
                 continue
             total_gift = sickness.next_payment_amount
             for member in members:
@@ -207,16 +207,11 @@ class ResPartner(models.Model):
                             member.bank_account_balance,
                             amount
                         ))
-                sickness_line = member.sick_ids.filtered(
-                    lambda x: not x.date_end
-                )
-                sickness = False
-                if sickness_line:
-                    sickness = sickness_line[0].id
                 vals=dict(
+                    date=next_payment_date,
                     partner_from_id=member.id,
                     partner_to_id=sickness.partner_id.id,
-                    sickness_id=sickness,
+                    sickness_id=sickness.id,
                     amount=total_gift * member.fair_share_factor
                 )
                 new_payment = self.env['member.payment'].create(vals)

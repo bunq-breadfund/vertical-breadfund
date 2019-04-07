@@ -15,9 +15,9 @@ class MemberPayment(models.Model):
 
     partner_from_id = fields.Many2one('res.partner', 'Member from', required=True)
     partner_to_id = fields.Many2one('res.partner', 'Member to', required=True)
-    date = fields.Datetime(default=lambda s: fields.Datetime.now())
+    date = fields.Date(default=lambda self: fields.Date.context_today(self))
     amount = fields.Float(required=True)
-    sickness_id = fields.Many2many('res.partner.sick')
+    sickness_id = fields.Many2one('res.partner.sick')
     state = fields.Selection(STATE, default='draft')
 
     @api.multi

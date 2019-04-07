@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import math
-from datetime import datetime, timedelta
+from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from odoo import fields, models, api, _
 from odoo.exceptions import ValidationError, UserError
@@ -19,11 +19,14 @@ class ResPartnerSick(models.Model):
     date_start = fields.Date('Start date', required=True)
     date_end = fields.Date('End date')
     percentage_id = fields.Many2one('res.partner.sick.percentage', required=True)
+    prev_payment_date = fields.Date(
+        string='Prev payment date', compute='_compute_next_payment_details')
     next_payment_date = fields.Date(
         string='Next payment date', compute='_compute_next_payment_details')
     next_payment_amount = fields.Monetary(
         string='Next payment amount', compute='_compute_next_payment_details')
-    payments_made = fields.Integer('Payments made', readonly=True)
+    payments_made = fields.Integer('Payments made')
+    payment_ids = fields.One2many('member.payment', 'sickness_id')
 
     @api.model
     def create(self, vals):
@@ -50,6 +53,7 @@ class ResPartnerSick(models.Model):
                     this.percentage_id.percentage / 100.0
                 payments_made = this.payments_made
                 if not payments_made:
+                    prev_payment_date = None
                     next_payment_date = date_paid_sick_start + relativedelta(months=1)
                     days_paid_sick = (date_sick_until - date_paid_sick_start).days
                     days_in_month = (next_payment_date - date_paid_sick_start).days
@@ -58,7 +62,7 @@ class ResPartnerSick(models.Model):
                 else:
                     prev_payment_date = date_paid_sick_start + relativedelta(months=payments_made)
                     if date_sick_until > prev_payment_date:
-                        next_payment_date = date_paid_sick_start + timedelta(month=1 + payments_made)
+                        next_payment_date = date_paid_sick_start + relativedelta(months=1 + payments_made)
                         days_paid_sick = (date_sick_until - prev_payment_date).days
                         days_in_month = (next_payment_date - prev_payment_date).days
                         factor = max(0.0, min(1.0, (days_paid_sick / days_in_month)))
@@ -66,28 +70,26 @@ class ResPartnerSick(models.Model):
                     else:
                         next_payment_date = None
                         next_payment_amount = None
+                this.prev_payment_date = prev_payment_date
                 this.next_payment_date = next_payment_date
                 this.next_payment_amount = next_payment_amount
 
     @api.multi
     def action_recreate_draft_payments(self):
-        for this in self:
-            payments = self.env['member.payment'].search([
-                ('sickness_id', '=', this.id)
-            ])
-            if payments:
-                expected_amount = len(payments) * this.monthly_sick_amount
-                payment_amounts = sum(payments.mapped('amount'))
-                if expected_amount != payment_amounts:
-                    for payment in payments:
-                        if payment.state == 'draft':
-                            payment.unlink()
-                        else:
-                            raise ValidationError(_(
-                                'You cannot delete paid payment records'
-                            ))
-                    this.payments_made = this.payments_made - 1
-                    self.env['res.partner'].cron_daily_gift_member()
+        self.ensure_one()
+        if self.payments_made < 1:
+            raise ValidationError(_('No payments made yet'))
+        prev_payments = self.env['member.payment'].search([
+            ('sickness_id', '=', self.id),
+            ('date', '>=', self.prev_payment_date)
+        ])
+        if not prev_payments:
+            raise ValidationError(_('Cannot find previous payments'))
+        if any(p.state == 'paid' for p in prev_payments):
+            raise ValidationError(_('Some payments are already paid, cannot cancel'))
+        prev_payments.unlink()
+        self.payments_made -= 1
+        self.env['res.partner'].cron_daily_gift_member()
 
 
 class ResPartnerSickPercentage(models.Model):

@@ -45,6 +45,7 @@
                             <field name="payments_made"/>
                         </group>
                         <group>
+                            <field name="prev_payment_date"/>
                             <field name="next_payment_date"/>
                             <field name="next_payment_amount"/>
                         </group>
@@ -59,7 +60,8 @@
         <field name="arch" type="xml">
             <search string="Sickness">
                 <field name="date_end"/>
-                <filter string="Sick Now" name="sick_now" domain="[('date_end', '=',False)]"/>
+                <filter string="Sick Now" name="sick_now"
+                        domain="['&amp;', ('date_start', '&lt;=', context_today().strftime('%%Y-%%m-%%d')), '|', ('date_end', '&gt;=', context_today().strftime('%%Y-%%m-%%d')), ('date_end', '=', False)]"/>
             </search>
         </field>
     </record>

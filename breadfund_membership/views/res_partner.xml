@@ -155,33 +155,6 @@
         <field name="sequence" eval="4"/>
     </record>
 
-    <record id="view_sickness_search" model="ir.ui.view">
-        <field name="model">res.partner.sick</field>
-        <field name="arch" type="xml">
-            <search string="Sickness">
-                <field name="date_end"/>
-                <filter string="Sick Now" name="sick_now" domain="[('date_end', '=',False)]"/>
-            </search>
-        </field>
-    </record>
-
-    <record model="ir.actions.act_window" id="action_membership_sickness">
-        <field name="name">Sickness</field>
-        <field name="res_model">res.partner.sick</field>
-        <field name="context">{"search_default_sick_now": 1}</field>
-        <field name="search_view_id" ref="view_sickness_search"/>
-        <field name="help" type="html">
-            <p class="oe_view_nocontent_create">
-              Click to add a Member's Sickness
-            </p>
-        </field>
-    </record>
-    <menuitem id="membership.menu_membership_sickness"
-              name="Sickness"
-              action="action_membership_sickness"
-              sequence="1"
-              parent="menu_membership_member"/>
-
     <record id="view_res_partner_member_filter" model="ir.ui.view">
         <field name="name">res.partner.select.active</field>
         <field name="model">res.partner</field>
