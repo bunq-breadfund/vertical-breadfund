@@ -44,12 +44,28 @@ class ResPartner(models.Model):
             or self.env['res.partner.member.type'].browse([]),
         string="Member Type")
     calculated_savings = fields.Monetary(
-        compute='_compute_calculated_savings',
-        store=True)
+        compute='_compute_calculated_savings'
+    )
     fair_share_factor = fields.Float(
         string='Fair share factor',
         compute='_compute_fair_share_factor'
     )
+    date_membership_start = fields.Date(default=lambda s: fields.Datetime.now())
+
+    monthly_contribution_paid = fields.Boolean(
+        compute='_compute_monthly_contribution_paid',
+        default=False
+    )
+
+    @api.multi
+    def _compute_monthly_contribution_paid(self):
+        for this in self:
+            unpaid_contributions = self.env['member.payment'].search([
+                ('partner_from_id', '=', this.id),
+                ('state', '!=', 'paid')
+            ])
+            if not unpaid_contributions:
+                this.monthly_contribution_paid = True
 
     def _compute_fair_share_factor(self):
         total_amount = 0.0
@@ -63,7 +79,7 @@ class ResPartner(models.Model):
         if result:
             total_amount = result[0][0]
         for this in self:
-            if total_amount > 0:
+            if total_amount and total_amount > 0:
                 this.fair_share_factor = \
                     this.monthly_sick_amount / total_amount
             else:
@@ -76,11 +92,10 @@ class ResPartner(models.Model):
         for this in self:
             upfront_contrib = this.member_type_id.upfront_contribution_amount
             contributions = self.env['member.contribution'].search([
-                ('partner_id', '=', this.id),
-                ('state', '=', 'posted')
+                ('partner_id', '=', this.id)
             ]).mapped('amount')
             gifted_payments = self.env['member.payment'].search([
-                ('partner_to_id', '=', this.id),
+                ('partner_from_id', '=', this.id),
                 ('state', '=', 'paid')
             ]).mapped('amount')
             this.calculated_savings = upfront_contrib + sum(contributions) \
@@ -136,6 +151,10 @@ class ResPartner(models.Model):
                     self.bank_account_balance
                 )
             )
+        if not self.date_membership_start:
+            raise ValidationError(_(
+                'To activate a member, Membership start date needs to be set.'
+            ))
         self.state = 'active'
 
     @api.multi
@@ -160,6 +179,20 @@ class ResPartner(models.Model):
                 template.send_mail(this.id)
 
     @api.model
+    def cron_monthly_contribution_member(self):
+        today = fields.Date.from_string(fields.Date.context_today(self))
+        members = self.get_active_members()
+        for member in members:
+            joined_date = fields.Date.from_string(member.date_membership_start)
+            if today.day == joined_date.day:
+                vals = dict(
+                    partner_id=member.id,
+                    date=fields.Datetime.now(),
+                    amount=member.monthly_contribution_amount
+                )
+                self.env['member.contribution'].create(vals)
+
+    @api.model
     def cron_daily_gift_member(self):
         today = fields.Date.context_today(self)
         members = self.get_active_members()
@@ -177,9 +210,16 @@ class ResPartner(models.Model):
                             member.bank_account_balance,
                             amount
                         ))
+                sickness_line = member.sick_ids.filtered(
+                    lambda x: not x.date_end
+                )
+                sickness = False
+                if sickness_line:
+                    sickness = sickness_line[0].id
                 vals=dict(
                     partner_from_id=member.id,
                     partner_to_id=sickness.partner_id.id,
+                    sickness_id=sickness,
                     amount=total_gift * member.fair_share_factor
                 )
                 self.env['member.payment'].create(vals)

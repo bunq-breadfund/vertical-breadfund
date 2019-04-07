@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="res_partner_sick_tree_view" model="ir.ui.view">
+        <field name="name">Sickness Tree</field>
+        <field name="model">res.partner.sick</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="date_start"/>
+                <field name="date_end"/>
+                <field name="percentage_id"/>
+                <field name="payments_made"/>
+                <field name="next_payment_date"/>
+                <field name="next_payment_amount"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="res_partner_sick_form_view" model="ir.ui.view">
+        <field name="name">Sickness Form</field>
+        <field name="model">res.partner.sick</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_recreate_draft_payments"
+                            type="object"
+                            string="Recreate Draft Payments"
+                            />
+                </header>
+                <sheet>
+                    <group col="2">
+                        <group>
+                            <field name="name"/>
+                            <field name="partner_id"/>
+                        </group>
+                        <group>
+                            <field name="date_start"/>
+                            <field name="date_end"/>
+                        </group>
+                    </group>
+                    <group col="2">
+                        <group>
+                            <field name="percentage_id"/>
+                            <field name="payments_made"/>
+                        </group>
+                        <group>
+                            <field name="next_payment_date"/>
+                            <field name="next_payment_amount"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_sickness_search" model="ir.ui.view">
+        <field name="model">res.partner.sick</field>
+        <field name="arch" type="xml">
+            <search string="Sickness">
+                <field name="date_end"/>
+                <filter string="Sick Now" name="sick_now" domain="[('date_end', '=',False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_membership_sickness">
+        <field name="name">Sickness</field>
+        <field name="res_model">res.partner.sick</field>
+        <field name="context">{"search_default_sick_now": 1}</field>
+        <field name="search_view_id" ref="view_sickness_search"/>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+              Click to add a Member's Sickness
+            </p>
+        </field>
+    </record>
+    <menuitem id="membership.menu_membership_sickness"
+              name="Sickness"
+              action="action_membership_sickness"
+              sequence="20"
+              parent="menu_membership_member"/>
+
+</odoo>

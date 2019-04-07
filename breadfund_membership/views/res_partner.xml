@@ -72,7 +72,14 @@
                         </group>
                     </group>
                     <group>
-                        <field name="bank_ids"/>
+                        <field name="bank_ids">
+                            <tree editable="bottom">
+                                <field name="acc_number" />
+                                <field name="bank_id"/>
+                                <field name="bank_name"/>
+                                <field name="partner_id"/>
+                            </tree>
+                        </field>
                     </group>
                 </page>
             </xpath>
@@ -86,7 +93,7 @@
                             <field name="name" readonly="1"/>
                             <field name="date_start" attrs="{'readonly': [('payments_made','>',0)]}"/>
                             <field name="date_end"/>
-                            <field name="percentage"/>
+                            <field name="percentage_id"/>
                             <field name="payments_made"/>
                             <field name="next_payment_date"/>
                             <field name="next_payment_amount"/>
@@ -136,6 +143,7 @@
             <xpath expr="//field[@name='name']" position="after">
                 <field name="state"/>
                 <field name="member_type_id"/>
+                <field name="date_membership_start"/>
             </xpath>
             <xpath expr="//field[@name='membership_stop']" position="after">
                 <field name="bank_account_balance"/>
@@ -145,6 +153,78 @@
 
     <record model="ir.actions.act_window.view" id="membership.action_membership_members_view_kanban">
         <field name="sequence" eval="4"/>
+    </record>
+
+    <menuitem id="menu_membership_member"
+              sequence="1"
+              name = "Membership"
+              parent="membership.menu_association"/>
+
+    <menuitem id="membership.menu_membership"
+              name="Members"
+              sequence="1"
+              parent="menu_membership_member"/>
+
+    <record id="view_sickness_search" model="ir.ui.view">
+        <field name="model">res.partner.sick</field>
+        <field name="arch" type="xml">
+            <search string="Sickness">
+                <field name="date_end"/>
+                <filter string="Sick Now" name="sick_now" domain="[('date_end', '=',False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_membership_sickness">
+        <field name="name">Sickness</field>
+        <field name="res_model">res.partner.sick</field>
+        <field name="context">{"search_default_sick_now": 1}</field>
+        <field name="search_view_id" ref="view_sickness_search"/>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+              Click to add a Member's Sickness
+            </p>
+        </field>
+    </record>
+    <menuitem id="membership.menu_membership_sickness"
+              name="Sickness"
+              action="action_membership_sickness"
+              sequence="1"
+              parent="menu_membership_member"/>
+
+    <record id="view_res_partner_member_filter" model="ir.ui.view">
+        <field name="name">res.partner.select.active</field>
+        <field name="model">res.partner</field>
+        <field name="priority">50</field>
+        <field name="inherit_id" ref="membership.view_res_partner_member_filter"/>
+        <field name="arch" type="xml">
+            <filter name="all_members" position="after">
+                 <filter name="active_members"
+                         domain="[('state', '=', 'active')]"
+                         string="Active Members"
+                         help="State Active"/>
+            </filter>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="membership.action_membership_members">
+        <field name="context">{"search_default_active_members": 1, "default_free_member": True}</field>
+    </record>
+
+    <record model="ir.ui.view" id="membership.membership_members_tree">
+        <field name="name">Members</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <tree string="Members" decoration-info="state == 'draft'" decoration-muted="state == 'waiting_auth'" decoration-danger="monthly_contribution_paid == True" >
+                <field name="monthly_contribution_paid" invisible="1"/>
+                <field name="name"/>
+                <field name="membership_state"/>
+                <field name="associate_member" attrs="{'invisible':[('membership_state', '!=', 'none')]}"/>
+                <field name="membership_start"/>
+                <field name="membership_stop"/>
+                <field name="user_id" invisible="1"/>
+            </tree>
+        </field>
     </record>
 
 </odoo>

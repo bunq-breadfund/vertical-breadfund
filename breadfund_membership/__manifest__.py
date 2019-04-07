@@ -17,10 +17,11 @@
         'security/res_groups.xml',
         'security/ir_rule.xml',
         'security/ir.model.access.csv',
+        'views/res_partner.xml',
         'views/member_contribution.xml',
         'views/member_payment.xml',
+        'views/res_partner_sick.xml',
         'views/res_company.xml',
-        'views/res_partner.xml',
         'views/res_partner_member_type.xml',
         'views/res_company.xml',
         'data/ir_cron.xml'

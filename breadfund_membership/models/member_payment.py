@@ -17,6 +17,7 @@ class MemberPayment(models.Model):
     partner_to_id = fields.Many2one('res.partner', 'Member to', required=True)
     date = fields.Datetime(default=lambda s: fields.Datetime.now())
     amount = fields.Float(required=True)
+    sickness_id = fields.Many2many('res.partner.sick')
     state = fields.Selection(STATE, default='draft')
 
     def action_confirm(self):

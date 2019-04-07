@@ -6,15 +6,6 @@
         <field name="model">member.contribution</field>
         <field name="arch" type="xml">
             <form>
-                <header>
-                    <button name="action_confirm"
-                            type="object"
-                            string="Confirm Payment"
-                            states="draft"/>
-                    <field name="state"
-                           widget="statusbar"
-                           statusbar_visible="draft,posted"/>
-               </header>
                 <sheet>
                     <group col="2">
                         <group>
@@ -66,14 +57,9 @@
         </field>
     </record>
 
-    <menuitem id="menu_member_member"
-              name = "Member Payments"
-              sequence="1"
-              parent="membership.menu_association"/>
-
     <menuitem action="action_member_contribution"
               id="menu_member_contribution"
               sequence="1"
-              parent="menu_member_member"/>
+              parent="menu_membership_member"/>
 
 </odoo>

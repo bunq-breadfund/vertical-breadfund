@@ -18,6 +18,7 @@
                     <group>
                         <field name="partner_from_id"/>
                         <field name="partner_to_id"/>
+                        <field name="sickness_id"/>
                         <field name="date"/>
                         <field name="amount"/>
                     </group>
@@ -33,6 +34,7 @@
             <tree>
                 <field name="partner_from_id"/>
                 <field name="partner_to_id"/>
+                <field name="sickness_id"/>
                 <field name="date"/>
                 <field name="amount"/>
                 <field name="state"/>
@@ -47,6 +49,7 @@
             <search string="Member Payments">
                 <field name="partner_from_id"/>
                 <field name="partner_to_id"/>
+                <field name="sickness_id"/>
                 <filter name="draft" string="Draft" domain="[('state','=','draft')]" help="Draft payments"/>
             </search>
         </field>
@@ -68,6 +71,6 @@
     <menuitem action="action_member_payment"
               id="menu_member_payment"
               sequence="2"
-              parent="menu_member_member"/>
+              parent="menu_membership_member"/>
 
 </odoo>
