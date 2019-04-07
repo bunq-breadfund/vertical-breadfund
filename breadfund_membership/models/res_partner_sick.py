@@ -14,8 +14,8 @@ class ResPartnerSick(models.Model):
     currency_id = fields.Many2one(
         'res.currency', related='partner_id.company_id.currency_id',
         string='Company Currency', readonly=True)
-    partner_id = fields.Many2one('res.partner')
-    name = fields.Char(default='New')
+    partner_id = fields.Many2one('res.partner', required=True)
+    name = fields.Char(default='New', required=True)
     date_start = fields.Date('Start date', required=True)
     date_end = fields.Date('End date')
     percentage_id = fields.Many2one('res.partner.sick.percentage', required=True)

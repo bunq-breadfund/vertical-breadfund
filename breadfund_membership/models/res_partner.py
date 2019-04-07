@@ -52,20 +52,17 @@ class ResPartner(models.Model):
     )
     date_membership_start = fields.Date(default=lambda s: fields.Datetime.now())
 
-    monthly_contribution_paid = fields.Boolean(
-        compute='_compute_monthly_contribution_paid',
-        default=False
+    net_balance = fields.Float(
+        compute='_compute_net_balance'
     )
 
+    monthly_contribution_paid = fields.Boolean()
+
     @api.multi
-    def _compute_monthly_contribution_paid(self):
+    def _compute_net_balance(self):
         for this in self:
-            unpaid_contributions = self.env['member.payment'].search([
-                ('partner_from_id', '=', this.id),
-                ('state', '!=', 'paid')
-            ])
-            if not unpaid_contributions:
-                this.monthly_contribution_paid = True
+            this.net_balance = this.bank_account_balance -\
+                this.calculated_savings
 
     def _compute_fair_share_factor(self):
         total_amount = 0.0
@@ -222,7 +219,9 @@ class ResPartner(models.Model):
                     sickness_id=sickness,
                     amount=total_gift * member.fair_share_factor
                 )
-                self.env['member.payment'].create(vals)
+                new_payment = self.env['member.payment'].create(vals)
+                if new_payment.partner_from_id == new_payment.partner_to_id:
+                    new_payment.state = 'paid'
             sickness.payments_made += 1
             # send mail to admin to validate these draft payments
 

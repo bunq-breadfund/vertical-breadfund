@@ -155,16 +155,6 @@
         <field name="sequence" eval="4"/>
     </record>
 
-    <menuitem id="menu_membership_member"
-              sequence="1"
-              name = "Membership"
-              parent="membership.menu_association"/>
-
-    <menuitem id="membership.menu_membership"
-              name="Members"
-              sequence="1"
-              parent="menu_membership_member"/>
-
     <record id="view_sickness_search" model="ir.ui.view">
         <field name="model">res.partner.sick</field>
         <field name="arch" type="xml">
@@ -215,8 +205,8 @@
         <field name="name">Members</field>
         <field name="model">res.partner</field>
         <field name="arch" type="xml">
-            <tree string="Members" decoration-info="state == 'draft'" decoration-muted="state == 'waiting_auth'" decoration-danger="monthly_contribution_paid == True" >
-                <field name="monthly_contribution_paid" invisible="1"/>
+            <tree string="Members" decoration-info="state == 'draft'" decoration-muted="state == 'waiting_auth'" decoration-danger="net_balance &lt; 0" >
+                <field name="net_balance" invisible="1"/>
                 <field name="name"/>
                 <field name="membership_state"/>
                 <field name="associate_member" attrs="{'invisible':[('membership_state', '!=', 'none')]}"/>

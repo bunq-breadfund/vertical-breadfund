@@ -20,6 +20,18 @@ class MemberPayment(models.Model):
     sickness_id = fields.Many2many('res.partner.sick')
     state = fields.Selection(STATE, default='draft')
 
+    @api.multi
+    def name_get(self):
+        res = []
+        for payment in self:
+            name = "{} - {} - {}".format(
+                payment.partner_from_id.name,
+                fields.Date.from_string(payment.date).isoformat(),
+                payment.amount
+            )
+            res.append((payment.id, name))
+        return res
+
     def action_confirm(self):
         self.ensure_one()
         self.state = 'posted'

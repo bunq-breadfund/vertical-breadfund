@@ -16,7 +16,7 @@ class MemberContribution(models.Model):
     def name_get(self):
         res = []
         for contribution in self:
-            name = "%s - %s - %s" % (
+            name = "{} - {} - {}".format(
                 contribution.partner_id.name,
                 fields.Date.from_string(contribution.date).isoformat(),
                 contribution.amount

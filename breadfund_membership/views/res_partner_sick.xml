@@ -81,4 +81,30 @@
               sequence="20"
               parent="menu_membership_member"/>
 
+    <record id="res_partner_sick_percentage_tree_view" model="ir.ui.view">
+        <field name="name">Sickness Percentage Tree</field>
+        <field name="model">res.partner.sick.percentage</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="name"/>
+                <field name="percentage"/>
+            </tree>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_membership_sickness_percentage">
+        <field name="name">Sickness Percentage</field>
+        <field name="res_model">res.partner.sick.percentage</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+              Click to add a Sickness Percentage
+            </p>
+        </field>
+    </record>
+    <menuitem id="menu_membership_sickness_percentage"
+              name="Sickness Percentage"
+              action="action_membership_sickness_percentage"
+              sequence="3"
+              parent="membership.menu_marketing_config_association"/>
+
 </odoo>

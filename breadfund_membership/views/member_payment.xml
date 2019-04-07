@@ -51,6 +51,7 @@
                 <field name="partner_to_id"/>
                 <field name="sickness_id"/>
                 <filter name="draft" string="Draft" domain="[('state','=','draft')]" help="Draft payments"/>
+                <filter name="posted" string="Posted" domain="[('state','=','posted')]" help="Posted payments"/>
             </search>
         </field>
     </record>
@@ -59,7 +60,7 @@
         <field name="res_model">member.payment</field>
         <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>
-        <field name="context">{'search_default_draft': True}</field>
+        <field name="context">{'search_default_draft': True, 'search_default_posted': True}</field>
         <field name="domain">[]</field>
         <field name="help" type="html">
             <p class="oe_view_nocontent_create">

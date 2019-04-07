@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <menuitem id="menu_membership_member"
+              sequence="1"
+              name = "Membership"
+              parent="membership.menu_association"/>
+
+    <menuitem id="membership.menu_membership"
+              name="Members"
+              sequence="1"
+              parent="menu_membership_member"/>
+</odoo>
