@@ -14,6 +14,18 @@ STATE = [
 class ResPartner(models.Model):
     _inherit = "res.partner"
 
+
+    @api.model
+    def _default_member_type_id(self):
+        ret = False
+        if self.env.context.get('search_default_basic_members'):
+            basic_member_ref = self.env.ref(
+                'breadfund_membership.basic_member_type',
+            )
+            if basic_member_ref:
+                ret = basic_member_ref
+        return ret
+
     state = fields.Selection(STATE, default='draft')
     bank_account_balance = fields.Monetary(
         string='Account balance')
@@ -38,10 +50,7 @@ class ResPartner(models.Model):
         readonly=True)
     member_type_id = fields.Many2one(
         'res.partner.member.type',
-        default=lambda self: self.env.ref(
-            'breadfund_membership.basic_member_type',
-            raise_if_not_found=False)
-            or self.env['res.partner.member.type'].browse([]),
+        default=_default_member_type_id,
         string="Member Type")
     calculated_savings = fields.Monetary(
         compute='_compute_calculated_savings'
@@ -50,13 +59,13 @@ class ResPartner(models.Model):
         string='Fair share factor',
         compute='_compute_fair_share_factor'
     )
-    date_membership_start = fields.Date(default=lambda s: fields.Datetime.now())
 
     net_balance = fields.Float(
         compute='_compute_net_balance'
     )
 
     monthly_contribution_paid = fields.Boolean()
+    date_membership_start = fields.Date(string='Membership Start Date')
 
     @api.multi
     def _compute_net_balance(self):
@@ -134,6 +143,10 @@ class ResPartner(models.Model):
                 'You cannot confirm a member that does '
                 'not have a bank account.'
             ))
+        if not self.date_membership_start:
+            raise ValidationError(_(
+                'To activate a member, Membership start date needs to be set.'
+            ))
         self.state = 'waiting_auth'
 
     @api.multi
@@ -148,10 +161,6 @@ class ResPartner(models.Model):
                     self.bank_account_balance
                 )
             )
-        if not self.date_membership_start:
-            raise ValidationError(_(
-                'To activate a member, Membership start date needs to be set.'
-            ))
         self.state = 'active'
 
     @api.multi
