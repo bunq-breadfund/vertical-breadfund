@@ -37,7 +37,7 @@ class BunqLib(object):
         if not api_key:
             result = self.generate_new_sandbox_user()
             api_key = result.api_key
-            print('API KEY GENERATED', api_key)
+        self.api_key = api_key
         self.setup_context(api_key)
         self.setup_current_user()
 
@@ -57,7 +57,13 @@ class BunqLib(object):
                 or isinstance(user, endpoint.UserLight)
         ):
             self.user = user
-            print(user)
+
+    def get_api_key(self):
+        """
+        :rtype: string
+        """
+
+        return self.api_key
 
     def get_current_user(self):
         """
@@ -85,6 +91,24 @@ class BunqLib(object):
                 all_monetary_account_bank_active.append(monetary_account_bank)
 
         return all_monetary_account_bank_active
+
+    def get_all_share_invite_bank_response(self, count=_DEFAULT_COUNT):
+        """
+        :type count: int
+        :rtype: list[endpoint.ShareInviteBankResponse]
+        """
+
+        pagination = Pagination()
+        pagination.count = count
+
+        all_share_invite_bank_response = endpoint.ShareInviteBankResponse.list(
+            pagination.url_params_count_only).value
+        return all_share_invite_bank_response
+
+    def accept_share_invite_bank_response(self, _id):
+        endpoint.ShareInviteBankResponse.update(
+            share_invite_bank_response_id=_id,
+            status='ACCEPTED')
 
     def get_all_payment(self, count=_DEFAULT_COUNT):
         """
@@ -144,3 +168,27 @@ class BunqLib(object):
         """
 
         return self.get_current_user().alias
+
+    def generate_new_sandbox_user(self):
+        """
+        :rtype: SandboxUser
+        """
+
+        url = "https://public-api.sandbox.bunq.com/v1/sandbox-user"
+
+        headers = {
+            'x-bunq-client-request-id': "uniqueness-is-required",
+            'cache-control': "no-cache",
+            'x-bunq-geolocation': "0 0 0 0 NL",
+            'x-bunq-language': "en_US",
+            'x-bunq-region': "en_US",
+        }
+
+        response = requests.request("POST", url, headers=headers)
+
+        if response.status_code is 200:
+            response_json = json.loads(response.text)
+            return endpoint.SandboxUser.from_json(
+                json.dumps(response_json["Response"][0]["ApiKey"]))
+
+        raise BunqException(self._ERROR_COULD_NOT_CREATE_NEW_SANDBOX_USER)

@@ -3,13 +3,13 @@
     <record id="base_view_partner_form_breadfund_bunq" model="ir.ui.view">
         <field name="name">base.view_partner_form.breadfund.bunq</field>
         <field name="model">res.partner</field>
-         <field name="priority">102</field>
+        <field name="priority">102</field>
         <field name="inherit_id" ref="base.view_partner_form"/>
         <field name="arch" type="xml">
             <xpath expr="//header" position="inside">
-                <button name="update_all_bunq_balances"
+                <button name="update_bunq_balance"
                         type="object"
-                        string="Update all BUNQ balances"/>
+                        string="Update BUNQ balance"/>
             </xpath>
         </field>
     </record>

@@ -6,8 +6,17 @@
         <field name="inherit_id" ref="base.view_company_form"/>
         <field name="priority">101</field>
         <field name="arch" type="xml">
+            <xpath expr="//sheet" position="before">
+                <header>
+                    <button name="generate_new_sandbox_user"
+                            confirm="Are you sure you want to delete the current sandbox user and generate a new one?"
+                            type="object"
+                            string="Generate new sandbox user"/>
+                </header>
+            </xpath>
             <xpath expr="//page[@name='breadfund']/group" position="inside">
                 <group name="bunq" string="bunq account of breadfund" colspan="4">
+                    <field name="bunq_phone"/>
                     <field name="bunq_email"/>
                     <field name="bunq_api_key"/>
                 </group>

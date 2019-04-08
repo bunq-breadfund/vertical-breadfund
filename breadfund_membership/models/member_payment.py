@@ -21,6 +21,11 @@ class MemberPayment(models.Model):
     state = fields.Selection(STATE, default='draft')
 
     @api.multi
+    def action_set_draft(self):
+        self.ensure_one()
+        self.state = 'draft'
+
+    @api.multi
     def name_get(self):
         res = []
         for payment in self:

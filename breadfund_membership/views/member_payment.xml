@@ -10,6 +10,10 @@
                             type="object"
                             string="Confirm Payment"
                             states="draft"/>
+                    <button name="action_set_draft"
+                            type="object"
+                            string="Set to Draft"
+                            states="posted,paid"/>
                     <field name="state"
                            widget="statusbar"
                            statusbar_visible="draft,posted,paid"/>

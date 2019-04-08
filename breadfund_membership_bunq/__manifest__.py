@@ -11,6 +11,7 @@
         'breadfund_membership',
     ],
     'data': [
+        'data/ir_cron.xml',
         'views/member_payment.xml',
         'views/res_company.xml',
         'views/res_partner.xml'
